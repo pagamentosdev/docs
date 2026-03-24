@@ -1,0 +1,69 @@
+---
+title: "Instalação"
+description: "Como integrar pagamentos.dev na sua aplicação"
+---
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+Escolha um [provedor de pagamento](/provedores) e conecte-o à sua aplicação.
+
+Neste exemplo, usaremos o `mockProvider`, mas você pode substituir por qualquer
+outro provedor disponível.
+
+```ts pagamentos.ts
+import { Pagamentos, mockProvider } from 'pagamentos'
+
+export const pg = new Pagamentos({
+  providers: [mockProvider()]
+})
+```
+
+Agora você pode usar a instância `pg` para acessar os métodos de pagamento.
+
+Utilizando [Hono](https://hono.dev/) como exemplo, você pode criar uma rota para
+processar webhooks do provedor:
+
+```ts main.ts
+import { Hono } from 'hono'
+import { toHono } from 'pagamentos/hono'
+
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+app.post('/webhook', toHono(pg.webhooks.handler))
+
+export default app
+```
+
+Confira todas as integrações com bibliotecas e frameworks disponíveis na seção
+de [integrações](/integracoes).
+
+## Desenvolvimento local
+
+Para receber notificações de pagamento localmente, você pode utilizar:
+
+- [ngrok](https://ngrok.com/docs/guides/share-localhost/overview)
+- [localtunnel](https://localtunnel.github.io/www/)
+- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)

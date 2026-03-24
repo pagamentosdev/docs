@@ -1,97 +1,106 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Introdução"
+description: "Uma integração, todos os pagamentos."
 ---
 
-## Setting up
+A **pagamentos.dev** é uma SDK construída para integrar pagamentos na sua
+aplicação de forma simples, moderna e rápida.
 
-Get your documentation site up and running in minutes.
+## Primeiros passos
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
 
-## Make it yours
+<CodeGroup>
 
-Design a docs site that looks great and empowers your users.
+```bash npm
+npm i pagamentos
+```
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+Agora crie uma instância e conecte um provedor:
+
+```ts pagamentos.ts
+import { Pagamentos, mockProvider } from 'pagamentos'
+
+export const pg = new Pagamentos({
+  providers: [
+    mockProvider() // Você pode substituir por qualquer outro provedor
+  ]
+})
+
+```
+
+Em seguida, basta usar a instância `pg` para acessar os métodos de pagamento.
+Por exemplo, para criar uma cobrança com Pix:
+
+```ts pagamentos.ts
+const pagamento = await pg.cobrancas.create({
+  valor: 1000, // valor em centavos
+  metodoPagamento: 'pix',
+  cliente: {
+    nome: 'João Silva',
+    documento: '123.456.789-00'
+  }
+})
+
+console.log(pagamento.qrcode)
+```
+
+## Por que usar pagamentos.dev?
+
+Integrar pagamentos pode ser complexo e demorado por diversos fatores:
+
+1. **Documentação inconsistente**: Muitas bibliotecas de pagamento têm
+documentação desatualizada, incompleta ou difícil de entender.
+2. **Múltiplos provedores**: Cada provedor de pagamento tem sua própria API e
+métodos de integração.
+3. **Manutenção contínua**: As APIs de pagamento estão sempre evoluindo, o que
+exige atualizações constantes na integração.
+4. **Falta de suporte**: Muitas bibliotecas não oferecem suporte adequado ou
+comunidade ativa para ajudar os desenvolvedores.
+5. **Lock-in**: Integrar diretamente com um provedor pode dificultar a troca 
+futura para outro serviço.
+
+A **pagamentos.dev** resolve esses problemas oferecendo uma interface unificada
+para vários provedores, documentação clara e atualizada, e uma comunidade ativa
+para suporte.
+
+Além disso, oferecemos outras funcionalidades avançadas, permitindo que você se
+concentre no desenvolvimento do seu produto, enquanto cuidamos dos pagamentos.
+
+<Columns columns={2}> 
+  <Card 
+    title="Roteamento inteligente"    
+    icon="route"
+    href="/features/roteamento-inteligente"
   >
-    Edit your docs locally and preview them in real time.
+    Priorize o provedor mais eficiente e aumente sua conversão
   </Card>
   <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
+    title="Componentes"
+    icon="react"
+    href="/features/componentes"
   >
-    Customize the design and colors of your site to match your brand.
+    Componentes pré-construídos para acelerar o desenvolvimento
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Observabilidade" icon="chart-line" href="/features/observabilidade">
+    Monitoramento e análise de desempenho dos seus pagamentos
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Extensibilidade" icon="puzzle-piece" href="/features/extensibilidade">
+    Adicione novos provedores e funcionalidades facilmente
   </Card>
 </Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
