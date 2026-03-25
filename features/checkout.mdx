@@ -1,0 +1,107 @@
+---
+title: "Checkout"
+description: "Como criar um fluxo de checkout com **pagamentos.dev**"
+icon: "basket-shopping"
+---
+
+## O que é um checkout?
+
+O checkout é a etapa final do processo de compra, onde o cliente fornece as
+informações de pagamento e conclui a transação. Você pode criar um fluxo de
+checkout transparente (utilizando a interface do provedor) ou customizado 
+(com uma interface própria).
+
+## Criando um checkout transparente
+
+Essa é a forma mais simples de implementar um checkout, onde o cliente é
+redirecionado para a página de pagamento do provedor. O provedor cuida de
+toda a interface e experiência de pagamento, garantindo segurança e conformidade
+com as normas do setor. **Essa é a opção recomendada para a maioria dos casos**.
+
+Para criar um checkout transparente, basta criar um checkout e redirecionar o
+cliente para a URL de pagamento fornecida pelo provedor. Por exemplo:
+
+```ts
+import { Hono } from 'hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+app.get('/checkout', async (c) => {
+  // Informações prévias para exibir na página de checkout
+  const url = await pg.checkoutTransparente.create({
+    valor: 1000, // valor em centavos    
+    produto: {
+      nome: 'Produto Exemplo',
+      descricao: 'Descrição do produto',
+      imagem: 'https://example.com/imagem.png'
+    }
+  })
+
+  return c.redirect(url)
+})
+
+export default app
+```
+
+No exemplo acima, quando o cliente acessar a rota `/checkout`, ele será
+redirecionado para a página de pagamento do provedor, onde poderá concluir a
+transação.
+
+## Criando um checkout customizado
+
+Para criar um checkout customizado, você precisa instalar a biblioteca em seu
+frontend e utilizar os componentes fornecidos para criar a interface de
+pagamento. Por exemplo, utilizando React:
+
+```tsx
+import { Checkout } from 'pagamentos/react'
+
+function App() {
+  return (
+    <Checkout
+      onSubmit={(data) => {
+        // Envie os dados para seu backend
+      }}
+    />    
+  )
+}
+
+export default App
+```
+
+No exemplo acima, o componente `Checkout` irá renderizar um formulário de
+pagamento. Você pode receber os dados do formulário no seu próprio backend e
+processar o pagamento utilizando os métodos da biblioteca.
+
+```ts
+import { Hono } from 'hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+app.post('/processar-pagamento', async (c) => {
+  const data = validarDados(c)
+
+  // Processar o pagamento utilizando os dados recebidos
+  const pagamento = await pg.cobrancas.create({
+    valor: data.valor,
+    metodoPagamento: data.metodoPagamento,
+    cliente: data.cliente,
+    cartaoCredito: {
+      token: data.cartaoCredito.token
+    }
+  })
+
+  await salvarNoBanco(pagamento)
+
+  return c.json({ success: true })
+})
+
+```
+
+Dependendo do método de pagamento escolhido, o processo pode envolver etapas 
+adicionais, como exibição de QR code para Pix e geração de boleto.
+
+Confira mais detalhes sobre os componentes disponíveis na seção de
+[integrações](/integracoes).

@@ -1,0 +1,96 @@
+---
+title: "Clientes"
+description: "Gerencie os clientes com **pagamentos.dev**"
+icon: "users"
+---
+
+## Gerenciando clientes
+
+Os provedores de pagamento geralmente exigem informações sobre os clientes para
+processar os pagamentos. Com a **pagamentos.dev**, você pode criar, atualizar e
+consultar os clientes de forma simples.
+
+<Info>
+A disponibilidade de operações podem variar dependendo do provedor conectado.
+</Info>
+
+## Criando um cliente
+
+```ts
+import { pg } from './pagamentos'
+
+const cliente = await pg.clientes.create({
+  nome: 'João Silva',
+  email: 'joaosilva@email.com',
+  documento: '123.456.789-00' // CPF ou CNPJ
+  // outros campos específicos do provedor
+})
+
+console.log(cliente.id) // ID gerado pelo provedor
+```
+
+## Consultando um cliente
+
+```ts
+import { pg } from './pagamentos'
+
+const cliente = await pg.clientes.get('id-do-cliente')
+
+console.log(cliente.nome) // João Silva
+```
+
+## Atualizando um cliente
+
+```ts
+import { pg } from './pagamentos'
+
+const cliente = await pg.clientes.update('id-do-cliente', {
+  email: 'joaosilva@novoemail.com'
+})
+
+console.log(cliente.email) // joaosilva@novoemail.com
+```
+
+## Listando clientes
+
+```ts
+import { pg } from './pagamentos'
+
+const clientes = await pg.clientes.list({
+  pagina: 1,
+  limite: 10
+})
+
+console.log(clientes) // Lista de clientes
+```
+
+<Info>
+Filtros disponíveis podem variar dependendo do provedor conectado. Consulte a
+documentação do provedor para detalhes específicos.
+</Info>
+
+## Excluindo um cliente
+
+```ts
+import { pg } from './pagamentos'
+
+await pg.clientes.delete('id-do-cliente')
+```
+
+## Usando clientes em outras operações
+
+As informações dos clientes podem ser utilizadas em outras operações, como na
+criação de cobranças ou checkouts, para associar os pagamentos a um cliente
+específico. Por exemplo:
+
+```ts
+import { pg } from './pagamentos'
+
+const pagamento = await pg.cobrancas.create({
+  valor: 1000, // valor em centavos
+  metodoPagamento: 'pix',
+  cliente: {
+    id: 'id-do-cliente' // Referência ao cliente criado anteriormente
+  }
+})
+```

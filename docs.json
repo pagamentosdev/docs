@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "luma",
+  "theme": "palm",
   "name": "pagamentos.dev",
   "colors": {
     "primary": "#121212",
@@ -17,8 +17,26 @@
         "tab": "Documentação",
         "groups": [
           {
-            "group": "Introdução",
-            "pages": ["index", "instalacao"]
+            "group": "Fundamentos",
+            "pages": ["index", "instalacao", "provedores"]
+          },
+          {
+            "group": "Funcionalidades",
+            "pages": [
+              "features/cobrancas",
+              "features/checkout",
+              "features/clientes"
+            ]
+          },
+          {
+            "expanded": false,
+            "group": "Provedores",
+            "pages": ["provedores/mock"]
+          },
+          {
+            "expanded": false,
+            "group": "Integrações",
+            "pages": []
           }
         ]
       },

@@ -1,0 +1,116 @@
+---
+title: "Cobranças"
+description: "Como criar e gerenciar cobranças com **pagamentos.dev**"
+icon: "credit-card"
+---
+
+## O que são cobranças?
+
+Cobranças são solicitações de pagamento criadas para um cliente, que podem ser
+pagas usando diversos métodos, como Pix, boleto, cartão de crédito, etc.
+
+Com **pagamentos.dev**, você pode criar, consultar, atualizar e cancelar
+cobranças  de forma simples e eficiente, utilizando uma interface unificada para
+diversos provedores de pagamento. 
+
+<Info>
+A disponibilidade de operações podem variar dependendo do provedor conectado.
+
+Consulte a documentação do provedor para detalhes específicos sobre as 
+funcionalidades suportadas.
+</Info>
+
+## Status das cobranças
+
+Para facilitar o gerenciamento, os status das cobranças são padronizados em:
+
+- `pendente`: A cobrança foi criada, mas ainda não foi paga.
+- `pago`: A cobrança foi paga com sucesso.
+- `cancelado`: A cobrança foi cancelada e não pode mais ser paga.
+- `vencido`: A cobrança não foi paga dentro do prazo e está vencida.
+- `falha`: Ocorreu um erro durante o processamento do pagamento.
+
+## Criando uma cobrança
+
+### Pix
+
+```ts
+import { pg } from './pagamentos'
+
+await pg.cobrancas.create({
+  valor: 1000, // valor em centavos
+  metodoPagamento: 'pix', // ou 'boleto', 'cartaoCredito', etc.
+  cliente: {
+    nome: 'João Silva',
+    documento: '123.456.789-00'
+  }
+})
+```
+
+### Cartão de crédito
+
+```ts
+import { pg } from './pagamentos'
+
+await pg.cobrancas.create({
+  valor: 5000, // valor em centavos
+  metodoPagamento: 'cartaoCredito',
+  cliente: {
+    nome: 'Maria Souza',
+    documento: '987.654.321-00'
+  },
+  cartaoCredito: {
+    token: 'token-do-cartao' // token gerado pelo provedor
+  }
+})
+```
+
+## Consultando uma cobrança
+
+```ts
+import { pg } from './pagamentos'
+
+const pagamento = await pg.cobrancas.get('id-da-cobranca')
+
+console.log(pagamento.status) // 'pendente', 'pago', 'cancelado', etc.
+```
+
+## Listando cobranças
+
+```ts
+import { pg } from './pagamentos'
+
+const pagamentos = await pg.cobrancas.list({
+  clienteDocumento: '123.456.789-00', // filtra por cliente
+  status: 'pendente' // filtra por status
+})
+
+console.log(pagamentos)
+```
+
+<Info>
+Filtros disponíveis podem variar dependendo do provedor conectado. Consulte a
+documentação do provedor para detalhes específicos.
+</Info>
+
+## Cancelando uma cobrança
+
+```ts
+import { pg } from './pagamentos'
+
+await pg.cobrancas.cancel('id-da-cobranca')
+```
+
+## Atualizando uma cobrança
+
+```ts
+import { pg } from './pagamentos'
+
+await pg.cobrancas.update('id-da-cobranca', {
+  valor: 1500, // novo valor em centavos
+  cliente: {
+    nome: 'João Silva',
+    documento: '123.456.789-00'
+  }
+})
+```
