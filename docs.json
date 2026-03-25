@@ -1,11 +1,25 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "palm",
+  "theme": "mint",
   "name": "pagamentos.dev",
   "colors": {
     "primary": "#121212",
     "light": "#e5e5e5",
     "dark": "#121212"
+  },
+  "background": {
+    "color": {
+      "dark": "#121212",
+      "light": "#fff"
+    }
+  },
+  "styling": {
+    "codeblocks": {
+      "theme": {
+        "dark": "vitesse-dark",
+        "light": "vitesse-light"
+      }
+    }
   },
   "favicon": {
     "dark": "/favicon-light.svg",
@@ -18,25 +32,41 @@
         "groups": [
           {
             "group": "Fundamentos",
-            "pages": ["index", "instalacao", "provedores"]
+            "pages": ["index", "instalacao", "provedores", "integracoes"]
           },
           {
             "group": "Funcionalidades",
             "pages": [
               "features/cobrancas",
+              "features/pagamentos",
               "features/checkout",
-              "features/clientes"
+              "features/clientes",
+              "features/webhooks"
             ]
           },
           {
-            "expanded": false,
             "group": "Provedores",
-            "pages": ["provedores/mock"]
+            "pages": [
+              "provedores/mock",
+              "provedores/abacatepay",
+              "provedores/mercadopago",
+              "provedores/woovi"
+            ]
           },
           {
-            "expanded": false,
             "group": "Integrações",
-            "pages": []
+            "pages": [
+              "integracoes/angular",
+              "integracoes/astro",
+              "integracoes/convex",
+              "integracoes/express",
+              "integracoes/fastify",
+              "integracoes/hono",
+              "integracoes/nextjs",
+              "integracoes/react",
+              "integracoes/tanstack-start",
+              "integracoes/vue"
+            ]
           }
         ]
       },

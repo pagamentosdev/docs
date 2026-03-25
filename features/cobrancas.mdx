@@ -1,7 +1,6 @@
 ---
 title: "Cobranças"
 description: "Como criar e gerenciar cobranças com **pagamentos.dev**"
-icon: "credit-card"
 ---
 
 ## O que são cobranças?
@@ -19,6 +18,20 @@ A disponibilidade de operações podem variar dependendo do provedor conectado.
 Consulte a documentação do provedor para detalhes específicos sobre as 
 funcionalidades suportadas.
 </Info>
+
+## Cobranças vs Pagamentos
+
+É importante entender a diferença entre cobranças e pagamentos:
+
+- **Cobranças**: São as solicitações de pagamento criadas para um cliente. Elas
+  representam o valor que deve ser pago, o método de pagamento, o cliente
+  associado, etc. As cobranças podem ter diferentes status, como `pendente`,
+  `pago`, `cancelado`, etc.
+  
+- **Pagamentos**: São as transações financeiras realizadas para quitar as
+  cobranças. Um pagamento pode ser bem-sucedido, falhar, ser estornado, etc. 
+  Os pagamentos estão diretamente relacionados às cobranças, mas representam
+  a ação de pagar, enquanto as cobranças representam a solicitação de pagamento.
 
 ## Status das cobranças
 

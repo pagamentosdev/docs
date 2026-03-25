@@ -1,0 +1,73 @@
+---
+title: "Pagamentos"
+description: "Como receber pagamentos com **pagamentos.dev**"
+---
+
+## O que são pagamentos?
+
+Pagamentos são as transações financeiras realizadas para quitar cobranças. Com
+**pagamentos.dev**, você pode receber pagamentos de forma simples e eficiente,
+utilizando uma interface unificada para diversos provedores de pagamento.
+
+## Cobranças vs Pagamentos
+
+É importante entender a diferença entre cobranças e pagamentos:
+
+- **Cobranças**: São as solicitações de pagamento criadas para um cliente. Elas
+  representam o valor que deve ser pago, o método de pagamento, o cliente
+  associado, etc. As cobranças podem ter diferentes status, como `pendente`,
+  `pago`, `cancelado`, etc.
+  
+- **Pagamentos**: São as transações financeiras realizadas para quitar as
+  cobranças. Um pagamento pode ser bem-sucedido, falhar, ser estornado, etc. 
+  Os pagamentos estão diretamente relacionados às cobranças, mas representam
+  a ação de pagar, enquanto as cobranças representam a solicitação de pagamento.
+
+## Recebendo pagamentos
+
+Para receber pagamentos, você precisa criar uma cobrança e fornecer as
+instruções de pagamento para o cliente. Usando Pix como exemplo:
+
+```ts
+import { pg } from './pagamentos'
+
+const cobranca = await pg.cobrancas.create({
+  valor: 1000, // valor em centavos
+  metodoPagamento: 'pix', // ou 'boleto', 'cartaoCredito', etc.
+  cliente: {
+    nome: 'João Silva',
+    documento: '123.456.789-00'
+  }
+})
+
+console.log(cobranca.qrcode)
+```
+
+Após o cliente realizar o pagamento, você pode:
+
+- Consultar o status da cobrança para verificar se o pagamento foi concluído.
+
+```ts
+const cobranca = await pg.cobrancas.get(cobranca.id)
+
+console.log(cobranca.status) // 'pendente', 'pago', 'cancelado', etc.
+```
+
+- **(Recomendado)** Receber notificações em tempo real sobre o status do
+  pagamento usando webhooks.
+
+```ts
+import { Pagamentos, onWebhookEvent } from 'pagamentos'
+
+const pg = new Pagamentos({
+  // Configurações do provedor...
+  hooks: [
+    onWebhookEvent('pagamento.realizado', async (event) => {
+      console.log(event.pagamento) // Informações do pagamento realizado      
+    })
+  ]
+})
+```
+
+Confira a seção de [webhooks](./webhooks) para saber como configurar e usar
+notificações em tempo real.

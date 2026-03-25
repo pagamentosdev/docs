@@ -3,6 +3,18 @@ title: "Introdução"
 description: "Uma integração, todos os pagamentos."
 ---
 
+<img 
+  src="/images/pagamentosdev-cover.png"
+  alt="Imagem com a logo da pagamentos.dev e um mapa do Brasil ao lado"
+  className="rounded-2xl block dark:hidden dark:invisible"  
+/>
+
+<img 
+  src="/images/pagamentosdev-dark-cover.png"
+  alt="Imagem com a logo da pagamentos.dev e um mapa do Brasil ao lado"
+  className="rounded-2xl dark:block hidden"  
+/>
+
 A **pagamentos.dev** é uma SDK construída para integrar pagamentos na sua
 aplicação de forma simples, moderna e rápida.
 
@@ -48,7 +60,7 @@ Em seguida, basta usar a instância `pg` para acessar os métodos de pagamento.
 Por exemplo, para criar uma cobrança com Pix:
 
 ```ts pagamentos.ts
-const pagamento = await pg.cobrancas.create({
+const cobranca = await pg.cobrancas.create({
   valor: 1000, // valor em centavos
   metodoPagamento: 'pix',
   cliente: {
@@ -57,7 +69,7 @@ const pagamento = await pg.cobrancas.create({
   }
 })
 
-console.log(pagamento.qrcode)
+console.log(cobranca.qrcode)
 ```
 
 ## Por que usar pagamentos.dev?

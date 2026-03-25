@@ -1,0 +1,62 @@
+---
+title: "Webhooks"
+description: "Como configurar e usar webhooks com **pagamentos.dev**"
+---
+
+## O que são webhooks?
+
+Como a maioria dos eventos de pagamento são assíncronos, os webhooks permitem
+que você se mantenha atualizado sobre o status das suas cobranças sem precisar
+fazer consultas constantes à API.
+
+Com **pagamentos.dev**, você pode configurar webhooks para receber notificações
+em tempo real sobre eventos importantes, como pagamentos realizados, cobranças
+vencidas, cancelamentos, etc.
+
+## Configurando webhooks
+
+Para receber webhooks, você precisa informar a chave de autenticação do seu
+provedor de pagamento. Usando Mercado Pago como exemplo:
+
+```ts
+import { Pagamentos, mercadopago, onWebhookEvent } from './pagamentos'
+
+const pg = new Pagamentos({
+  mercadopago: {
+    accessToken: 'SEU_ACCESS_TOKEN',
+    signingSecret: 'SEU_SIGNING_SECRET' // necessário para validar os webhooks
+  },
+  hooks: [
+    onWebhookEvent('pagamento.realizado', async (event) => {
+      // Lógica para processar o pagamento realizado
+    }),
+    onWebhookEvent('cobranca.vencida', async (event) => {
+      // Lógica para processar a cobrança vencida
+    })
+  ]
+})
+```
+
+## Recebendo webhooks
+
+Para receber os webhooks, você precisa criar um endpoint na sua aplicação que
+possa processar as requisições enviadas pelo provedor de pagamento. Usando 
+Hono como exemplo:
+
+```ts
+import { Hono } from 'hono'
+import { toHono } from 'pagamentos/hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+// pagamentos.dev já cuida da autenticação para você 🤗
+app.post('/webhook', toHono(pg.webhooks.handler))
+
+export default app
+```
+
+A função `toHono` é um adaptador que converte o handler de webhooks do
+**pagamentos.dev** para ser compatível com o framework Hono. Confira outras
+[integrações de frameworks](https://docs.pagamentos.dev/integracoes) para ver 
+como usar com Express, Fastify, etc.
