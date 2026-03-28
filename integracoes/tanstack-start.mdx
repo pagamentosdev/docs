@@ -3,3 +3,85 @@ title: "TanStack Start"
 description: "Integrando o TanStack Start com o **pagamentos.dev**"
 icon: "/icons/tanstack.svg"
 ---
+
+## O que é TanStack Start?
+
+TanStack Start é um framework de roteamento e renderização baseado em React,
+construído sobre TanStack Router para fornecer roteamento com tipagem segura e
+renderização no servidor.
+
+Visite o site oficial do [TanStack Start](https://tanstack.com/start) para saber
+mais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Frontend
+
+Crie uma página com `createFileRoute` para exibir o checkout:
+
+```tsx src/routes/checkout.tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { Checkout, CheckoutValues } from 'pagamentos/react'
+
+export const Route = createFileRoute('/checkout')({
+  component: CheckoutPage
+})
+
+function CheckoutPage() {
+  async function onSubmit(data: CheckoutValues) {
+    console.log('Dados do pagamento:', data)
+  }
+
+  return (
+    <Checkout 
+      onSubmit={onSubmit}
+      metodoPagamento={[
+        'pix',
+        'boleto',
+        'cartaoCredito'
+      ]}      
+    />
+  )
+}
+```
+
+## Backend (API Routes)
+
+TanStack Start usa `createFileRoute` com `server.handlers` para definir API routes:
+
+```ts src/routes/api/webhook.ts
+import { createFileRoute } from '@tanstack/react-router'
+import { toTanStackStart } from 'pagamentos/tanstack-start'
+import { pg } from '../../pagamentos'
+
+export const Route = createFileRoute('/api/webhook')({
+  server: {
+    handlers: {
+      POST: toTanStackStart(pg.webhooks.handler)
+    }
+  }
+})
+```

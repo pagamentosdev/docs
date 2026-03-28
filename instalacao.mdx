@@ -104,7 +104,7 @@ async function simularPagamento() {
   const cobrancas = await pg.cobrancas.list()
   const cobranca = cobrancas[0]
 
-  await pg.providers.mock.simulateCobranca(cobranca.id) // Acesível apenas para o mockProvider
+  await pg.providers.mock.simulateCobranca(cobranca.id) // Acessível apenas para o mockProvider
 }
 ```
 

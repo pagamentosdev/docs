@@ -1,0 +1,55 @@
+---
+title: "Elysia"
+description: "Integrando o Elysia com o **pagamentos.dev**"
+icon: "/icons/elysia.svg"
+---
+
+## O que é Elysia?
+
+Elysia é um framework web para Bun e Node.js focado em performance e ergonomia,
+com tipagem automática de endpoints.
+
+Visite o site oficial do [Elysia](https://elysia.dev/) para saber mais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Integração com Elysia
+
+Para receber webhooks do **pagamentos.dev** usando Elysia, você pode usar o
+adaptador `toElysia` que converte o handler de webhooks para ser compatível
+com o framework.
+
+```ts server.ts
+import { Elysia } from 'elysia'
+import { toElysia } from 'pagamentos/elysia'
+import { pg } from './pagamentos'
+
+const app = new Elysia()
+
+app.post('/webhook', toElysia(pg.webhooks.handler))
+
+app.listen(3000)
+```

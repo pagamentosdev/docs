@@ -3,3 +3,173 @@ title: "AbacatePay"
 description: "Integre o AbacatePay com o **pagamentos.dev**"
 icon: "/icons/abacatepay.svg"
 ---
+
+## O que é a AbacatePay?
+
+A AbacatePay é uma fintech brasileira de infraestrutura de pagamentos. 
+
+Visite o site oficial da [AbacatePay](https://www.abacatepay.com/) para saber
+mais.
+
+## Gerando o token de acesso
+
+Primeiro, obtenha seu token de acesso na dashboard da AbacatePay. Você precisará
+desse token para autenticar suas requisições e gerenciar cobranças.
+
+Siga o 
+[guia oficial da AbacatePay](https://docs.abacatepay.com/pages/authentication)
+sobre autenticação para gerar seu token.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Configuração
+
+Agora, configure o provedor da AbacatePay na sua aplicação:
+
+```ts pagamentos.ts
+import { Pagamentos, abacatepay } from 'pagamentos'
+
+export const pg = new Pagamentos({
+  providers: [
+    abacatepay({
+      apiKey: process.env.ABACATEPAY_API_KEY,
+      webhookSecret: process.env.ABACATEPAY_WEBHOOK_SECRET
+    })
+  ]
+})
+```
+
+## Criando uma cobrança
+
+Para criar uma cobrança com Pix, por exemplo:
+
+```ts
+const cobranca = await pg.cobrancas.create({
+  valor: 1000, // R$10,00 - valor em centavos 
+  metodoPagamento: 'pix',
+  cliente: {
+    nome: 'João Silva', 
+    documento: '123.456.789-00' // CPF ou CNPJ
+  }
+})
+
+console.log(cobranca.qrcode) // QR code para pagamento via Pix
+```
+
+Você pode seguir o guia do **pagamentos.dev** para explorar outras
+funcionalidades.
+
+## Recebendo notificações de pagamento
+
+Configure um endpoint para receber as notificações de pagamento da AbacatePay:
+
+```ts
+import { Hono } from 'hono'
+import { toHono } from 'pagamentos/hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+app.post('/webhooks', toHono(pg.webhooks.handler))
+
+export default app
+```
+
+Certifique-se de configurar a URL do webhook na dashboard da AbacatePay para
+apontar para o endpoint que você criou. Assim, você receberá notificações
+sempre que um pagamento for atualizado, permitindo que você mantenha o status
+dos pagamentos sincronizado com sua aplicação.
+
+### Testar localmente
+
+Para receber notificações de pagamento localmente, você pode utilizar as
+seguintes ferramentas:
+
+- [ngrok](https://ngrok.com/docs/guides/share-localhost/overview)
+- [localtunnel](https://localtunnel.github.io/www/)
+- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)
+
+## Uso independente
+
+Se preferir, você pode usar o provedor da AbacatePay de forma independente, sem
+precisar da classe `Pagamentos`:
+
+```ts
+import { AbacatePay } from 'pagamentos/abacatepay'
+
+const abacate = new AbacatePay({
+  apiKey: process.env.ABACATEPAY_API_KEY,
+  webhookSecret: process.env.ABACATEPAY_WEBHOOK_SECRET
+})
+
+// Aqui você tem acesso a métodos específicos da AbacatePay
+const checkout = await abacate.checkout.create({
+  items: [
+    {
+      id: 'item_abc123',
+      quantity: 2
+    }
+  ],
+  customerId: 'cust_987'
+})
+```
+
+### Effect.ts
+
+Você também pode utilizar com a biblioteca [Effect.ts](https://effect.website):
+
+```ts
+import { Effect } from 'effect'
+import { AbacatePay } from 'pagamentos/abacatepay/effect'
+
+const AbacateLive = AbacatePay.layerConfig({
+  apiKey: Config.redacted('ABACATEPAY_API_KEY'),
+  webhookSecret: Config.redacted('ABACATEPAY_WEBHOOK_SECRET')
+})
+
+// Effect.Effect<string, AbacatePayError, AbacatePay>
+const program = Effect.gen(function* () {
+  const abacate = yield* AbacatePay
+
+  const checkout = yield* abacate.checkout.create({
+    items: [
+      {
+        id: 'item_abc123',
+        quantity: 2
+      }
+    ],
+    customerId: 'cust_987'
+  })
+
+  return checkout.data.url
+})
+
+Effect.runPromise(
+  program.pipe(
+    Effect.provide(AbacateLive)
+  )
+)
+```

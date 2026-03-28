@@ -3,3 +3,55 @@ title: "Hono"
 description: "Integrando o Hono com o **pagamentos.dev**"
 icon: "/icons/hono.svg"
 ---
+
+## O que é Hono?
+
+Hono é um framework web minimalista e de alto desempenho para JavaScript e
+TypeScript. Ele é projetado para ser compatível com várias plataformas, 
+incluindo Node.js, Deno e Cloudflare Workers.
+
+Visite o site oficial do [Hono](https://hono.dev/) para saber mais. 
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Integração com Hono
+
+Para receber webhooks do **pagamentos.dev** usando Hono, você pode usar o
+adaptador `toHono` que converte o handler de webhooks para ser compatível com o
+framework.
+
+```ts
+import { Hono } from 'hono'
+import { toHono } from 'pagamentos/hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+// pagamentos.dev já cuida da autenticação para você 🤗
+app.post('/webhook', toHono(pg.webhooks.handler))
+
+export default app
+```

@@ -3,3 +3,84 @@ title: "React"
 description: "Integrando o React com o **pagamentos.dev**"
 icon: "/icons/react.svg"
 ---
+
+## O que é React?
+
+React é uma biblioteca JavaScript para construir interfaces de usuário. Ele é
+amplamente utilizado para criar aplicações web interativas e responsivas.
+
+Visite o site oficial do [React](https://react.dev/) para saber mais.
+
+<Note>
+React é uma biblioteca de frontend. Isso significa que ele é executado no
+navegador do usuário e você pode usá-lo para criar interfaces de pagamento.
+
+Para lidar com a lógica de pagamento, como criar cobranças, processar pagamentos
+e lidar com webhooks, você ainda precisará de um backend. Confira o [guia de 
+integração com Backend](/guia/integrando-backend) para saber como configurar.
+</Note>
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Seu primeiro componente
+
+Vamos usar o componente `Checkout` para criar um checkout de pagamento simples:
+
+<CodeGroup>
+```tsx checkout.tsx
+import { Checkout, CheckoutValues } from 'pagamentos/react'
+
+export function CheckoutPage() {
+  async function onSubmit(data: CheckoutValues) {
+    console.log('Dados do pagamento:', data)
+  }
+
+  return (
+    <Checkout 
+      onSubmit={onSubmit}
+      metodoPagamento={[
+        'pix',
+        'boleto',
+        'cartaoCredito'
+      ]}      
+    />
+  )
+}
+```
+
+```tsx main.tsx
+import { createRoot } from 'react-dom/client'
+import { CheckoutPage } from './checkout'
+
+const root = createRoot(document.getElementById('root')!)
+root.render(<CheckoutPage />)
+```
+
+</CodeGroup>
+
+Ao carregar a página, você verá um formulário de checkout com os métodos de
+pagamento especificados. Quando o usuário preencher o formulário e enviar, os
+dados do pagamento serão registrados no console.

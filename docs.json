@@ -59,21 +59,18 @@
               "integracoes/angular",
               "integracoes/astro",
               "integracoes/convex",
+              "integracoes/elysia",
               "integracoes/express",
               "integracoes/fastify",
               "integracoes/hono",
               "integracoes/nextjs",
               "integracoes/react",
+              "integracoes/svelte",
               "integracoes/tanstack-start",
               "integracoes/vue"
             ]
           }
         ]
-      },
-      {
-        "icon": "",
-        "tab": "Guias",
-        "groups": []
       }
     ],
     "global": {

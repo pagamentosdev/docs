@@ -3,3 +3,68 @@ title: "Astro"
 description: "Integrando o Astro com o **pagamentos.dev**"
 icon: "/icons/astro.svg"
 ---
+
+## O que é Astro?
+
+Astro é um framework web que prioriza conteúdo e permite construir websites
+rápidos com qualquer linguagem de UI que você preferir.
+
+Visite o site oficial do [Astro](https://astro.build/) para saber mais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Frontend
+
+Para usar componentes de pagamento em páginas Astro, utilize a diretiva
+`client:load` para hidratação:
+
+```astro ---
+import { Checkout } from 'pagamentos/astro'
+import CheckoutComponent from '../components/Checkout.vue'
+---
+
+<html lang="pt-BR">
+  <head>
+    <title>Checkout</title>
+  </head>
+  <body>
+    <CheckoutComponent client:load />
+  </body>
+</html>
+```
+
+## Backend (API Routes)
+
+Astro suporta API routes para tratamento de webhooks. Crie um endpoint em
+`src/pages/api/webhook.ts`:
+
+```ts src/pages/api/webhook.ts
+import type { APIRoute } from 'astro'
+import { toAstro } from 'pagamentos/astro'
+import { pg } from '../../pagamentos'
+
+export const POST: APIRoute = toAstro(pg.webhooks.handler)
+```

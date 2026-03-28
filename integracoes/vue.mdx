@@ -3,3 +3,69 @@ title: "Vue"
 description: "Integrando o Vue com o **pagamentos.dev**"
 icon: "/icons/vue.svg"
 ---
+
+## O que é Vue?
+
+Vue.js é um framework progressivo para construção de interfaces de usuário.
+Ele é projetado para ser adotado incrementalmente e se destaca pela sua
+simplicidade e flexibilidade.
+
+Visite o site oficial do [Vue](https://vuejs.org/) para saber mais.
+
+<Note>
+Vue é um framework de frontend. Isso significa que ele é executado no
+navegador do usuário e você pode usá-lo para criar interfaces de pagamento.
+
+Para lidar com a lógica de pagamento, como criar cobranças, processar pagamentos
+e lidar com webhooks, você ainda precisará de um backend. Confira o [guia de
+integração com Backend](/guia/integrando-backend) para saber como configurar.
+</Note>
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Seu primeiro componente
+
+Vamos usar o componente `Checkout` para criar um checkout de pagamento simples:
+
+```vue Checkout.vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Checkout, CheckoutValues } from 'pagamentos/vue'
+
+const metodos = ['pix', 'boleto', 'cartaoCredito']
+
+async function onSubmit(data: CheckoutValues) {
+  console.log('Dados do pagamento:', data)
+}
+</script>
+
+<template>
+  <Checkout 
+    :metodo-pagamento="metodos"
+    @submit="onSubmit"
+  />
+</template>
+```

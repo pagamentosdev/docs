@@ -3,3 +3,53 @@ title: "Fastify"
 description: "Integrando o Fastify com o **pagamentos.dev**"
 icon: "/icons/fastify.svg"
 ---
+
+## O que é Fastify?
+
+Fastify é um framework web altamente performático e de baixo overhead para
+Node.js, focado em fornecer a melhor experiência de desenvolvimento.
+
+Visite o site oficial do [Fastify](https://fastify.dev/) para saber mais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Integração com Fastify
+
+Para receber webhooks do **pagamentos.dev** usando Fastify, você pode usar o
+adaptador `toFastify` que converte o handler de webhooks para ser compatível
+com o framework.
+
+```ts server.ts
+import Fastify from 'fastify'
+import { toFastify } from 'pagamentos/fastify'
+import { pg } from './pagamentos'
+
+const fastify = Fastify()
+
+fastify.post('/webhook', toFastify(pg.webhooks.handler))
+
+fastify.listen({ port: 3000 })
+```

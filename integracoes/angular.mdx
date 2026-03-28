@@ -3,3 +3,73 @@ title: "Angular"
 description: "Integrando o Angular com o **pagamentos.dev**"
 icon: "/icons/angular.svg"
 ---
+
+## O que é Angular?
+
+Angular é um framework de desenvolvimento web criado pelo Google, usado para
+construir aplicações de página única (SPAs) robustas para cenários corporativos.
+
+Visite o site oficial do [Angular](https://angular.dev/) para saber mais.
+
+<Note>
+Angular é um framework de frontend. Isso significa que ele é executado no
+navegador do usuário e você pode usá-lo para criar interfaces de pagamento.
+
+Para lidar com a lógica de pagamento, como criar cobranças, processar pagamentos
+e lidar com webhooks, você ainda precisará de um backend. Confira o [guia de
+integração com Backend](/guia/integrando-backend) para saber como configurar.
+</Note>
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Seu primeiro componente
+
+Vamos usar o componente `Checkout` para criar um checkout de pagamento simples:
+
+```ts checkout.component.ts
+import { Component } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { Checkout, CheckoutValues } from 'pagamentos/angular'
+
+@Component({
+  selector: 'app-checkout',
+  standalone: true,
+  imports: [CommonModule, Checkout],
+  template: `
+    <pagamentos-checkout 
+      [metodoPagamento]="metodos"
+      (onSubmit)="onSubmit($event)"
+    />
+  `
+})
+export class CheckoutComponent {
+  metodos = ['pix', 'boleto', 'cartaoCredito']
+
+  async onSubmit(data: CheckoutValues) {
+    console.log('Dados do pagamento:', data)
+  }
+}
+```

@@ -3,3 +3,172 @@ title: "Mercado Pago"
 description: "Integre o Mercado Pago com o **pagamentos.dev**"
 icon: "/icons/mercadopago.svg"
 ---
+
+## O que é o Mercado Pago?
+
+O Mercado Pago é uma plataforma de pagamentos do Mercado Libre, líder na América
+Latina.
+
+Visite o site oficial do [Mercado Pago](https://www.mercadopago.com.br/) para
+saber mais.
+
+## Gerando credenciais
+
+Para utilizar a API do Mercado Pago, você precisa obter suas credenciais
+(Access Token) na dashboard. Siga o
+[guia oficial do Mercado Pago](https://www.mercadopago.com.br/developers/pt/docs/your-integrations/credentials)
+sobre autenticação para gerar suas credenciais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Configuração
+
+Configure o provedor do Mercado Pago na sua aplicação:
+
+```ts pagamentos.ts
+import { Pagamentos, mercadopago } from 'pagamentos'
+
+export const pg = new Pagamentos({
+  providers: [
+    mercadopago({
+      accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
+    })
+  ]
+})
+```
+
+## Criando uma cobrança
+
+Para criar uma cobrança com Pix, por exemplo:
+
+```ts
+const cobranca = await pg.cobrancas.create({
+  valor: 1000, // R$10,00 - valor em centavos 
+  metodoPagamento: 'pix',
+  cliente: {
+    nome: 'João Silva', 
+    documento: '123.456.789-00' // CPF ou CNPJ
+  }
+})
+
+console.log(cobranca.qrcode) // QR code para pagamento via Pix
+```
+
+Você pode seguir o guia do **pagamentos.dev** para explorar outras
+funcionalidades.
+
+## Métodos de pagamento suportados
+
+O Mercado Pago suporta diversos métodos de pagamento:
+
+- `pix` - Pagamento instantâneo via Pix
+- `boleto` - Boleto bancário registrado
+- `cartaoCredito` - Cartão de crédito
+- `cartaoDebito` - Cartão de débito
+
+## Recebendo notificações de pagamento
+
+Configure um endpoint para receber as notificações de pagamento do Mercado Pago:
+
+```ts
+import { Hono } from 'hono'
+import { toHono } from 'pagamentos/hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+app.post('/webhooks', toHono(pg.webhooks.handler))
+
+export default app
+```
+
+Certifique-se de configurar a URL do webhook na dashboard do Mercado Pago para
+apontar para o endpoint que você criou. Assim, você receberá notificações
+sempre que um pagamento for atualizado.
+
+### Testar localmente
+
+Para receber notificações de pagamento localmente, você pode utilizar as
+seguintes ferramentas:
+
+- [ngrok](https://ngrok.com/docs/guides/share-localhost/overview)
+- [localtunnel](https://localtunnel.github.io/www/)
+- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)
+
+## Uso independente
+
+Se preferir, você pode usar o provedor do Mercado Pago de forma independente, sem
+precisar da classe `Pagamentos`:
+
+```ts
+import { MercadoPago } from 'pagamentos/mercadopago'
+
+const mp = new MercadoPago({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
+})
+
+const cobranca = await mp.cobrancas.create({
+  valor: 1000,
+  cliente: {
+    nome: 'João Silva',
+    documento: '12345678900'
+  }
+})
+```
+
+### Effect.ts
+
+Você também pode utilizar com a biblioteca [Effect.ts](https://effect.website):
+
+```ts
+import { Effect } from 'effect'
+import { MercadoPago } from 'pagamentos/mercadopago/effect'
+
+const MercadoPagoLive = MercadoPago.layerConfig({
+  accessToken: Config.redacted('MERCADOPAGO_ACCESS_TOKEN')
+})
+
+// Effect.Effect<string, MercadoPagoError, MercadoPago>
+const program = Effect.gen(function* () {
+  const mp = yield* MercadoPago
+
+  const cobranca = yield* mp.cobrancas.create({
+    valor: 1000,
+    cliente: {
+      nome: 'João Silva',
+      documento: '12345678900'
+    }
+  })
+
+  return cobranca.qrcode
+})
+
+Effect.runPromise(
+  program.pipe(
+    Effect.provide(MercadoPagoLive)
+  )
+)
+```

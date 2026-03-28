@@ -1,5 +1,199 @@
 ---
 title: "Mock Provider"
-description: "Provedor de teste para desenvolvimento"
+description: "Provedor de teste para desenvolvimento local"
 icon: "/icons/pagamentos.svg"
 ---
+
+## O que é o Mock Provider?
+
+O Mock Provider é um provedor de pagamento simulado, projetado para facilitar o
+desenvolvimento e teste de funcionalidades de pagamento sem necessidade de um
+provedor real ou configuração de credenciais.
+
+Visite o guia de [instalação](/instalacao) para saber como configurar.
+
+## Por que usar?
+
+- **Desenvolvimento local** - Teste sua integração sem custos de transação
+- **CI/CD** - Ideal para pipelines de integração contínua
+- **Rapidez** - Sem necessidade de credenciais reais
+- **Simulação completa** - Teste webhooks, status e todo o fluxo
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Configuração
+
+Configure o provedor mock na sua aplicação:
+
+```ts pagamentos.ts
+import { Pagamentos, mockProvider } from 'pagamentos'
+
+export const pg = new Pagamentos({
+  providers: [mockProvider()]
+})
+```
+
+## Criando uma cobrança
+
+Para criar uma cobrança simulada com Pix, por exemplo:
+
+```ts
+const cobranca = await pg.cobrancas.create({
+  valor: 1000, // R$10,00 - valor em centavos 
+  metodoPagamento: 'pix',
+  cliente: {
+    nome: 'João Silva', 
+    documento: '123.456.789-00' // CPF ou CNPJ
+  }
+})
+
+console.log(cobranca.qrcode) // QR code simulado
+console.log(cobranca.status) // 'pendente'
+```
+
+## Simulando pagamentos
+
+O Mock Provider permite simular o pagamento de uma cobrança para testar webhooks
+e fluxos de status:
+
+```ts
+import { pg } from './pagamentos'
+
+async function simularPagamento() {
+  const cobrancas = await pg.cobrancas.list()
+  const cobranca = cobrancas[0]
+
+  await pg.providers.mock.simulateCobranca(cobranca.id)
+  
+  console.log('Pagamento simulado com sucesso!')
+}
+```
+
+### Simulando diferentes cenários
+
+Você pode simular diferentes status de pagamento:
+
+```ts
+// Simular pagamento aprovado
+await pg.providers.mock.simulateCobranca(cobranca.id, 'pago')
+
+// Simular pagamento cancelado
+await pg.providers.mock.simulateCobranca(cobranca.id, 'cancelado')
+
+// Simular expiração
+await pg.providers.mock.simulateCobranca(cobranca.id, 'expirado')
+```
+
+## Recebendo notificações de pagamento
+
+Configure um endpoint para receber as notificações simuladas:
+
+```ts
+import { Hono } from 'hono'
+import { toHono } from 'pagamentos/hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+app.post('/webhooks', toHono(pg.webhooks.handler))
+
+export default app
+```
+
+O Mock Provider enviará webhooks simulados sempre que você usar
+`simulateCobranca()`, permitindo testar toda a lógica de processamento de
+pagamentos.
+
+### Testar localmente
+
+Para receber notificações de pagamento localmente, você pode utilizar as
+seguintes ferramentas:
+
+- [ngrok](https://ngrok.com/docs/guides/share-localhost/overview)
+- [localtunnel](https://localtunnel.github.io/www/)
+- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)
+
+## Métodos de pagamento suportados
+
+O Mock Provider suporta todos os métodos de pagamento:
+
+- `pix` - Pagamento instantâneo simulado
+- `boleto` - Boleto simulado
+- `cartaoCredito` - Cartão de crédito simulado
+- `cartaoDebito` - Cartão de débito simulado
+
+## Uso independente
+
+Se preferir, você pode usar o Mock Provider de forma independente, sem precisar
+da classe `Pagamentos`:
+
+```ts
+import { MockProvider } from 'pagamentos/mock'
+
+const mock = new MockProvider()
+
+const cobranca = await mock.cobrancas.create({
+  valor: 1000,
+  cliente: {
+    nome: 'João Silva',
+    documento: '12345678900'
+  }
+})
+
+await mock.simulateCobranca(cobranca.id)
+```
+
+### Effect.ts
+
+Você também pode utilizar com a biblioteca [Effect.ts](https://effect.website):
+
+```ts
+import { Effect } from 'effect'
+import { MockProvider } from 'pagamentos/mock/effect'
+
+const MockProviderLive = MockProvider.layerConfig()
+
+// Effect.Effect<string, MockProviderError, MockProvider>
+const program = Effect.gen(function* () {
+  const mock = yield* MockProvider
+
+  const cobranca = yield* mock.cobrancas.create({
+    valor: 1000,
+    cliente: {
+      nome: 'João Silva',
+      documento: '12345678900'
+    }
+  })
+
+  return cobranca.qrcode
+})
+
+Effect.runPromise(
+  program.pipe(
+    Effect.provide(MockProviderLive)
+  )
+)
+```

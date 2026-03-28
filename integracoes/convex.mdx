@@ -3,3 +3,62 @@ title: "Convex"
 description: "Integrando o Convex com o **pagamentos.dev**"
 icon: "/icons/convex.svg"
 ---
+
+## O que é Convex?
+
+Convex é uma plataforma de backend que combina banco de dados em tempo real,
+funções serverless e sincronização de estado automática.
+
+Visite o site oficial do [Convex](https://convex.dev/) para saber mais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Backend
+
+No Convex, você define funções serverless no arquivo `convex/`
+. Use o adaptador `toConvex` para integrar webhooks:
+
+```ts convex/webhooks.ts
+import { toConvex } from 'pagamentos/convex'
+import { pg } from '../pagamentos'
+
+export const webhookHandler = toConvex(pg.webhooks.handler)
+```
+
+```ts convex/http.ts
+import { httpRouter } from 'convex/server'
+import { webhookHandler } from './webhooks'
+
+const http = httpRouter()
+
+http.route({
+  path: '/webhook',
+  method: 'POST',
+  handler: webhookHandler,
+})
+
+export default http
+```

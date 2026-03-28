@@ -3,3 +3,72 @@ title: "Next.js"
 description: "Integrando o Next.js com o **pagamentos.dev**"
 icon: "/icons/next.svg"
 ---
+
+## O que é Next.js?
+
+Next.js é um framework React para construção de aplicações web full-stack. Ele
+suporta renderização no servidor, geração estática e outras estratégias
+modernas.
+
+Visite o site oficial do [Next.js](https://nextjs.org/) para saber mais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Frontend
+
+Para criar interfaces de pagamento no frontend, use o componente `Checkout`:
+
+```tsx app/checkout/page.tsx
+import { Checkout, CheckoutValues } from 'pagamentos/react'
+
+export default function CheckoutPage() {
+  async function onSubmit(data: CheckoutValues) {
+    console.log('Dados do pagamento:', data)
+  }
+
+  return (
+    <Checkout 
+      onSubmit={onSubmit}
+      metodoPagamento={[
+        'pix',
+        'boleto',
+        'cartaoCredito'
+      ]}      
+    />
+  )
+}
+```
+
+## Backend (API Routes)
+
+No Next.js App Router, crie um `route.ts` para tratar webhooks:
+
+```ts app/api/webhook/route.ts
+import { toNextJs } from 'pagamentos/nextjs'
+import { pg } from '@/pagamentos'
+
+export const POST = toNextJs(pg.webhooks.handler)
+```

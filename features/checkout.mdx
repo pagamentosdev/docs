@@ -7,18 +7,18 @@ description: "Como criar um fluxo de checkout com **pagamentos.dev**"
 
 O checkout é a etapa final do processo de compra, onde o cliente fornece as
 informações de pagamento e conclui a transação. Você pode criar um fluxo de
-checkout transparente (utilizando a interface do provedor) ou customizado 
-(com uma interface própria).
+checkout (utilizando a interface do provedor) ou customizado (com uma interface
+própria).
 
-## Criando um checkout transparente
+## Criando um checkout 
 
 Essa é a forma mais simples de implementar um checkout, onde o cliente é
 redirecionado para a página de pagamento do provedor. O provedor cuida de
 toda a interface e experiência de pagamento, garantindo segurança e conformidade
 com as normas do setor. **Essa é a opção recomendada para a maioria dos casos**.
 
-Para criar um checkout transparente, basta criar um checkout e redirecionar o
-cliente para a URL de pagamento fornecida pelo provedor. Por exemplo:
+Para criar um checkout, basta criar um checkout e redirecionar o cliente para a
+URL de pagamento fornecida pelo provedor. Por exemplo:
 
 ```ts
 import { Hono } from 'hono'
@@ -28,7 +28,7 @@ const app = new Hono()
 
 app.get('/checkout', async (c) => {
   // Informações prévias para exibir na página de checkout
-  const url = await pg.checkoutTransparente.create({
+  const url = await pg.checkout.create({
     valor: 1000, // valor em centavos    
     produto: {
       nome: 'Produto Exemplo',
@@ -47,11 +47,13 @@ No exemplo acima, quando o cliente acessar a rota `/checkout`, ele será
 redirecionado para a página de pagamento do provedor, onde poderá concluir a
 transação.
 
-## Criando um checkout customizado
+## Criando um checkout customizado (transparente)
 
-Para criar um checkout customizado, você precisa instalar a biblioteca em seu
-frontend e utilizar os componentes fornecidos para criar a interface de
-pagamento. Por exemplo, utilizando React:
+Para criar um checkout customizado (transparente), você precisa criar a
+interface de pagamento em seu frontend e enviar os dados para seu backend.
+
+Você pode utilizar os componentes fornecidos pela biblioteca para facilitar a
+criação da interface de pagamento. Por exemplo, utilizando React:
 
 ```tsx
 import { Checkout } from 'pagamentos/react'

@@ -3,3 +3,166 @@ title: "Woovi"
 description: "Integre o Woovi com o **pagamentos.dev**"
 icon: "/icons/woovi.svg"
 ---
+
+## O que é a Woovi?
+
+A Woovi é uma plataforma de pagamentos brasileira que oferece soluções completas
+para receber e processar pagamentos via Pix.
+
+Visite o site oficial da [Woovi](https://woovi.com/) para saber mais.
+
+## Gerando o token de acesso
+
+Para utilizar a API da Woovi, você precisa criar uma chave de API na dashboard.
+Siga o [guia oficial da Woovi](https://developers.woovi.com/docs/apis/api-getting-started)
+para gerar seu AppID.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Configuração
+
+Configure o provedor da Woovi na sua aplicação:
+
+```ts pagamentos.ts
+import { Pagamentos, woovi } from 'pagamentos'
+
+export const pg = new Pagamentos({
+  providers: [
+    woovi({
+      appId: process.env.WOOVI_APP_ID
+    })
+  ]
+})
+```
+
+## Criando uma cobrança
+
+Para criar uma cobrança com Pix, por exemplo:
+
+```ts
+const cobranca = await pg.cobrancas.create({
+  valor: 1000, // R$10,00 - valor em centavos 
+  metodoPagamento: 'pix',
+  cliente: {
+    nome: 'João Silva', 
+    documento: '123.456.789-00', // CPF ou CNPJ
+    email: 'joao@exemplo.com',
+    telefone: '5511999999999'
+  }
+})
+
+console.log(cobranca.qrcode) // QR code para pagamento via Pix
+console.log(cobranca.correlationID) // ID para rastreamento
+```
+
+Você pode seguir o guia do **pagamentos.dev** para explorar outras
+funcionalidades.
+
+## Recebendo notificações de pagamento
+
+Configure um endpoint para receber as notificações de pagamento da Woovi:
+
+```ts
+import { Hono } from 'hono'
+import { toHono } from 'pagamentos/hono'
+import { pg } from './pagamentos'
+
+const app = new Hono()
+
+app.post('/webhooks', toHono(pg.webhooks.handler))
+
+export default app
+```
+
+Certifique-se de configurar a URL do webhook na dashboard da Woovi para
+apontar para o endpoint que você criou. Assim, você receberá notificações
+sempre que um pagamento for atualizado.
+
+### Testar localmente
+
+Para receber notificações de pagamento localmente, você pode utilizar as
+seguintes ferramentas:
+
+- [ngrok](https://ngrok.com/docs/guides/share-localhost/overview)
+- [localtunnel](https://localtunnel.github.io/www/)
+- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)
+
+## Uso independente
+
+Se preferir, você pode usar o provedor da Woovi de forma independente, sem
+precisar da classe `Pagamentos`:
+
+```ts
+import { Woovi } from 'pagamentos/woovi'
+
+const woovi = new Woovi({
+  appId: process.env.WOOVI_APP_ID
+})
+
+const cobranca = await woovi.cobrancas.create({
+  valor: 1000,
+  cliente: {
+    nome: 'João Silva',
+    documento: '12345678900'
+  }
+})
+
+console.log(cobranca.qrcode)
+```
+
+### Effect.ts
+
+Você também pode utilizar com a biblioteca [Effect.ts](https://effect.website):
+
+```ts
+import { Effect } from 'effect'
+import { Woovi } from 'pagamentos/woovi/effect'
+
+const WooviLive = Woovi.layerConfig({
+  appId: Config.redacted('WOOVI_APP_ID')
+})
+
+// Effect.Effect<string, WooviError, Woovi>
+const program = Effect.gen(function* () {
+  const woovi = yield* Woovi
+
+  const cobranca = yield* woovi.cobrancas.create({
+    valor: 1000,
+    cliente: {
+      nome: 'João Silva',
+      documento: '12345678900'
+    }
+  })
+
+  return cobranca.qrcode
+})
+
+Effect.runPromise(
+  program.pipe(
+    Effect.provide(WooviLive)
+  )
+)
+```

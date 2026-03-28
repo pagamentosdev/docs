@@ -1,0 +1,68 @@
+---
+title: "Svelte"
+description: "Integrando o Svelte com o **pagamentos.dev**"
+icon: "/icons/svelte.svg"
+---
+
+## O que é Svelte?
+
+Svelte é um framework JavaScript que compila componentes em código imperativo
+altamente otimizado, eliminando o virtual DOM e resultando em aplicações
+extremamente performáticas.
+
+Visite o site oficial do [Svelte](https://svelte.dev/) para saber mais.
+
+<Note>
+Svelte é um framework de frontend. Isso significa que ele é executado no
+navegador do usuário e você pode usá-lo para criar interfaces de pagamento.
+
+Para lidar com a lógica de pagamento, como criar cobranças, processar pagamentos
+e lidar com webhooks, você ainda precisará de um backend. Confira o [guia de
+integração com Backend](/guia/integrando-backend) para saber como configurar.
+</Note>
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Seu primeiro componente
+
+Vamos usar o componente `Checkout` para criar um checkout de pagamento simples:
+
+```svelte Checkout.svelte
+<script lang="ts">
+  import { Checkout, CheckoutValues } from 'pagamentos/svelte'
+
+  const metodos = ['pix', 'boleto', 'cartaoCredito']
+
+  async function onSubmit(data: CheckoutValues) {
+    console.log('Dados do pagamento:', data)
+  }
+</script>
+
+<Checkout 
+  {metodos}
+  onSubmit={onSubmit}
+/>
+```

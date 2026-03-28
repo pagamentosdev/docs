@@ -3,3 +3,53 @@ title: "Express"
 description: "Integrando o Express com o **pagamentos.dev**"
 icon: "/icons/express.svg"
 ---
+
+## O que é Express?
+
+Express é um framework web minimalista para Node.js que fornece uma interface
+robusta para construção de APIs e aplicações web.
+
+Visite o site oficial do [Express](https://expressjs.com/) para saber mais.
+
+## Instalação
+
+Para começar o desenvolvimento, instale a biblioteca com seu gerenciador de
+pacotes favorito:
+
+<CodeGroup>
+
+```bash npm
+npm i pagamentos
+```
+
+```bash Yarn
+yarn add pagamentos
+```
+
+```bash pnpm
+pnpm add pagamentos
+```
+
+```bash Bun
+bun i pagamentos
+```
+
+</CodeGroup>
+
+## Integração com Express
+
+Para receber webhooks do **pagamentos.dev** usando Express, você pode usar o
+adaptador `toExpress` que converte o handler de webhooks para ser compatível
+com o framework.
+
+```ts server.ts
+import express from 'express'
+import { toExpress } from 'pagamentos/express'
+import { pg } from './pagamentos'
+
+const app = express()
+
+app.post('/webhook', toExpress(pg.webhooks.handler))
+
+app.listen(3000)
+```
